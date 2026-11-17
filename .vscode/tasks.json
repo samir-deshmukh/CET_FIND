@@ -3,14 +3,16 @@
     "tasks": [
         {
             "label": "CETFind: Start local application",
-            "type": "shell",
-            "command": "powershell",
+            "type": "process",
+            "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
             "args": [
+                "-NoLogo",
                 "-NoProfile",
+                "-NonInteractive",
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
-                "${workspaceFolder}/scripts/start_cetfind.ps1"
+                "${workspaceFolder}\\scripts\\start_cetfind.ps1"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
