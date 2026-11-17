@@ -6,3 +6,31 @@ services:
       CET_ENV: development
       CET_ADMIN_COOKIE_SECURE: "0"
       CET_PDF_STORAGE_BACKEND: local
+
+  worker:
+    build:
+      context: .
+    command: ["uvicorn", "backend.local_worker:app", "--host", "0.0.0.0", "--port", "8765", "--workers", "1"]
+    restart: unless-stopped
+    environment:
+      CAPFIND_WORKER_BACKEND_INTERNAL_URL: "http://backend:8000"
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - cetfind_worker_data:/app/data/local_worker
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/health', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 20s
+
+volumes:
+  cetfind_worker_data:

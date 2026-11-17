@@ -77,6 +77,26 @@ def test_production_admin_origins_are_allowlisted():
     assert "https://cetfind.onrender.com" in local_worker.ALLOWED_ORIGINS
     assert "https://cetfind-backend.onrender.com" in local_worker.ALLOWED_ORIGINS
 
+def test_compose_worker_routes_local_admin_callbacks_to_backend_service(monkeypatch):
+    monkeypatch.setenv("CAPFIND_WORKER_BACKEND_INTERNAL_URL", "http://backend:8000")
+    assert local_worker._backend_ok("http://localhost:8000") == "http://backend:8000"
+    assert local_worker._backend_ok("http://127.0.0.1:8000") == "http://backend:8000"
+
+
+def test_compose_worker_rejects_unsafe_internal_backend_override(monkeypatch):
+    from fastapi import HTTPException
+
+    monkeypatch.setenv("CAPFIND_WORKER_BACKEND_INTERNAL_URL", "http://attacker.example:8000")
+    with pytest.raises(HTTPException):
+        local_worker._backend_ok("http://localhost:8000")
+
+
+@pytest.mark.parametrize("origin", ["http://localhost:8000", "http://127.0.0.1:8000"])
+def test_local_admin_origin_can_reach_loopback_worker(origin):
+    status, headers = _preflight(origin)
+    assert status == 200
+    assert headers[b"access-control-allow-origin"] == origin.encode()
+    assert headers[b"access-control-allow-private-network"] == b"true"
 
 def test_private_network_preflight_allows_hosted_admin_to_reach_loopback_worker():
     status, headers = _preflight("https://cetfind.onrender.com")

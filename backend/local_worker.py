@@ -97,6 +97,18 @@ def _backend_ok(value: str) -> str:
         raise HTTPException(400, "Backend URL must use HTTPS")
     if parsed.hostname not in ALLOWED_HOSTS:
         raise HTTPException(400, "Backend host is not allow-listed")
+
+    # Browser submits its local admin origin. Inside this worker container,
+    # localhost is the worker itself, so route callbacks through Compose DNS.
+    # This fixed override is local-only and is never supplied by the browser.
+    internal = os.getenv("CAPFIND_WORKER_BACKEND_INTERNAL_URL", "").strip()
+    if internal and parsed.hostname in {"localhost", "127.0.0.1"}:
+        target = urlparse(internal)
+        if (target.scheme != "http" or target.hostname != "backend"
+                or target.port != 8000 or target.path not in {"", "/"}
+                or target.username or target.password or target.query or target.fragment):
+            raise HTTPException(500, "Worker internal backend URL is invalid")
+        return internal.rstrip("/")
     return value.rstrip("/")
 
 

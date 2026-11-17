@@ -1,3 +1,28 @@
+## Windows / local CAP_FIND setup
+
+The local CAP_FIND Docker Compose overlay starts the PDF worker automatically. No separate Windows Python installation, Linux shell script, or systemd service is required for the local application.
+
+From PowerShell, run this from the project folder (the explicit paths below also work from another folder):
+
+~~~powershell
+docker compose -p cap_find --env-file .env.docker-local -f compose.yaml -f compose.local.yaml up -d --build
+~~~
+
+The worker is published only on 127.0.0.1:8765, restarts automatically with Docker, and stores its queue/recovery state in the persistent cap_find_cetfind_worker_data volume. The database continues using its existing cap_find_cetfind_pgdata volume.
+
+Check worker readiness:
+
+~~~powershell
+Invoke-RestMethod http://127.0.0.1:8765/health
+docker compose -p cap_find --env-file .env.docker-local -f compose.yaml -f compose.local.yaml ps
+docker compose -p cap_find --env-file .env.docker-local -f compose.yaml -f compose.local.yaml logs --tail 80 worker
+~~~
+
+Expected health response includes "ok": true. If the worker is unhealthy, inspect its logs before retrying an import. Do not delete the worker or database volumes to troubleshoot; they contain recovery state and application data.
+
+When remote private storage is not configured, the same-PC worker can also extract PDFs uploaded through the live admin panel opened on this same computer. That fallback is intentionally tied to this PC: keep Docker Desktop running and do not shut down the computer during extraction. A remote worker plus private S3-compatible storage is required when uploads must remain queued and process independently of the admin's PC.
+
+---
 # CAPFind Remote Extraction Worker
 
 ## How remote panel use works
