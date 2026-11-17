@@ -6,3 +6,16 @@ services:
       CET_ENV: development
       CET_ADMIN_COOKIE_SECURE: "0"
       CET_PDF_STORAGE_BACKEND: local
+
+  # Serve the candidate-facing static site locally, matching the separate
+  # static-site service used in production. This is local-only configuration.
+  web:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./site:/usr/share/nginx/html:ro
+    depends_on:
+      backend:
+        condition: service_started
