@@ -47,7 +47,6 @@ The backend is exposed locally at http://127.0.0.1:8000. Its liveness endpoint i
 
 Required environment variables include the local PostgreSQL connection settings and CET_ADMIN_SESSION_SECRET. Keep real values in local environment files; never paste them into source files or commit them.
 
-
 ## Tests
 
 Development dependencies are listed in requirements-dev.txt.
@@ -64,3 +63,17 @@ PostgreSQL integration tests require a dedicated isolated TEST_DATABASE_URL. The
 ## Documentation
 
 Start with [the documentation index](docs/README.md). It identifies current guidance and separates historical design documents from instructions for the deployed application.
+
+## Windows one-key local startup
+
+Open this repository as the VS Code workspace. Press **F5** and select **CETFind: Run locally (Docker + Website)** if prompted. VS Code runs `scripts/start_cetfind.ps1` first; the script starts Docker Desktop when needed, starts PostgreSQL + FastAPI + the local static website, waits for both HTTP checks, and only then launches Chrome.
+
+The local candidate website is served by the `web` Nginx container at http://127.0.0.1:8080. The FastAPI backend/admin is at http://127.0.0.1:8000. The web container is defined only in `compose.local.yaml`; it does not change the production Render architecture.
+
+To start without F5, run this from PowerShell in the repository root:
+
+~~~powershell
+.\scripts\start_cetfind.ps1
+~~~
+
+First-time setup still requires Docker Desktop and a local `.env.docker-local` created from `.env.docker-local.example`. The first start may download the Nginx image and build the backend image.
