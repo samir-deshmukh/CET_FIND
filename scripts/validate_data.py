@@ -60,6 +60,9 @@ SECTION_MAP = {
     'State Level': 'SL',
     'Minority Seats : Minority Seats Allotted to Minority Candidates': 'MI-MIN',
     'Minority Seats : Minority Seats Allotted to Non Minority Candidates': 'MI-NONMIN',
+    # 2026 PHARMA CAP PDFs use this heading for Maharashtra-candidature
+    # minority seats; MI is canonically classified under State Level.
+    'Minority Seats Allotted to Maharashtra State Candidature Candidates': 'SL',
 }
 
 # Values that have appeared in the `category` column but are not category
