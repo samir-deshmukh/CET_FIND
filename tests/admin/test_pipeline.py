@@ -156,6 +156,12 @@ def test_cutoff_dimension_fallbacks_match_validator_semantics():
     }) == ("MI", False, "SL", "Unknown")
 
     assert _resolve_cutoff_dimensions({
+        "category": "MI",
+        "section": "Minority Seats Allotted to Maharashtra State Candidature Candidates",
+        "stage": "",
+    }) == ("MI", False, "SL", "Unknown")
+
+    assert _resolve_cutoff_dimensions({
         "category": "GOPENH",
         "section": "",
         "stage": "Stage-I",
