@@ -19,9 +19,16 @@ from scripts.validate_data import (
     forward_fill_block_columns,
     is_extraction_anomaly,
     parse_category,
+    SECTION_MAP,
     parse_filename as parse_cutoff_filename,
 )
 from scripts.validate_seats import parse_filename as parse_seat_filename
+
+
+def test_pharma_maharashtra_minority_section_maps_to_state_level():
+    heading = "Minority Seats Allotted to Maharashtra State Candidature Candidates"
+    assert SECTION_MAP[heading] == "SL"
+    assert parse_category("MI") == ("MI", False, "SL")
 
 
 def test_cutoff_token_helpers():
